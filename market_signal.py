@@ -40,6 +40,8 @@ def fetch_data(ticker_symbol: str, start_date, end_date, interval: str = "1h") -
         auto_adjust=False,
         progress=False,
     )
+    if isinstance(stock_data.columns, pd.MultiIndex):
+        stock_data.columns = stock_data.columns.get_level_values(0)
     return stock_data
 
 
@@ -162,10 +164,10 @@ def compute_signal_from_indicators(df: pd.DataFrame) -> Dict:
     Hitung score, raw_position, final_position, last_tr dari DataFrame OHLC.
     Return dict dengan semua nilai yang dibutuhkan.
     """
-    open_ = df["Open"].astype(float)
-    close = df["Close"].astype(float)
-    high = df["High"].astype(float)
-    low = df["Low"].astype(float)
+    open_ = df["Open"].astype(float).squeeze()
+    close = df["Close"].astype(float).squeeze()
+    high = df["High"].astype(float).squeeze()
+    low = df["Low"].astype(float).squeeze()
 
     # Indikator utama
     ema_fast = compute_ema(close, span=21)
