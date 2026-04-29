@@ -4,4 +4,4 @@ numpy
 scikit-learn
 joblib
 openpyxl
-yfinance
+yfinance==0.2.66
