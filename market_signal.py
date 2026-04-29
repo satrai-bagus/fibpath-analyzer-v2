@@ -27,6 +27,12 @@ ADX_NO_TRADE_THRESHOLD = 15.0  # ADX di bawah ini: NO TRADE
 EXTREME_TR_MULT = 1.6          # jika True Range bar terakhir > 1.6 * ATR → NO TRADE
 WICK_RATIO = 2                 # wick > ratio * range candle → dihindari
 
+# Dataset training v2 dibangun dengan notebook yang ADX-nya selalu NaN
+# (bug DataFrame/Series broadcast di compute_adx). Selama model masih dipakai,
+# paksa ADX = NaN supaya score & filter konsisten dengan training distribution.
+# Matikan flag ini setelah model di-retrain dengan ADX yang benar.
+LEGACY_ADX_NAN = True
+
 
 # ============================
 # Download data
@@ -186,6 +192,8 @@ def compute_signal_from_indicators(df: pd.DataFrame) -> Dict:
     rsi_last = float(rsi.dropna().iloc[-1]) if rsi.dropna().size > 0 else np.nan
     atr_last = float(atr.dropna().iloc[-1]) if atr.dropna().size > 0 else np.nan
     adx_last = float(adx.dropna().iloc[-1]) if adx.dropna().size > 0 else np.nan
+    if LEGACY_ADX_NAN:
+        adx_last = np.nan
 
     # ============================
     # Skoring bullish vs bearish
